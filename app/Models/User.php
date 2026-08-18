@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\TurnoFijo;
 use App\Models\Feriado;
-
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -23,6 +23,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'nombre',
+        'apellido',
+        'slug',
         'email',
         'password',
     ];
@@ -49,31 +52,43 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    
+
     public function patients()
     {
         return $this->hasMany(Patient::class);
     }
 
     public function turnos()
-{
-    return $this->hasMany(Turno::class);
-  
-}
-      public function feriados()
-{
-    return $this->hasMany(Feriado::class);
-}   
-public function obrasSociales()
-{
-    return $this->hasMany(ObraSocial::class);
-}
+    {
+        return $this->hasMany(Turno::class);
+    }
+    
+    public function feriados()
+    {
+        return $this->hasMany(Feriado::class);
+    }
+    
+    public function obrasSociales()
+    {
+        return $this->hasMany(ObraSocial::class);
+    }
 
-public function turnosFijos()
-{
-    return $this->hasMany(TurnoFijo::class);
-}
-
-
-
+    public function turnosFijos()
+    {
+        return $this->hasMany(TurnoFijo::class);
+    }
+    
+    protected static function booted()
+    {
+        static::saving(function ($user) {
+            // Si usa nombre y apellido separados
+            if (!empty($user->nombre) && !empty($user->apellido)) {
+                $user->slug = Str::slug($user->nombre . '-' . $user->apellido);
+            } 
+            // Si usa el campo unificado 'name' de Laravel
+            elseif (!empty($user->name)) {
+                $user->slug = Str::slug($user->name);
+            }
+        });
+    }
 }

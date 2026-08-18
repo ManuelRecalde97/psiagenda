@@ -10,24 +10,27 @@ use App\Models\ObraSocial;
 
 class PublicTurnoController extends Controller
 {
-    // Muestra la vista pública con los turnos y obras sociales del psicólogo
-    public function show($id)
+    // Muestra la vista pública con los turnos y obras sociales del psicólogo usando el slug
+    public function show($slug)
     {
-        $psicologo = User::with([
+        $psicologo = User::where('slug', $slug)->with([
             'turnos' => function ($q) {
                 $q->where('estado', 'disponible')
-                ->where('fecha_hora', '>=', now()) //filtramos para ocultar dias pasados 
+                ->where('fecha_hora', '>=', now()) // filtramos para ocultar dias pasados 
                 ->orderBy('fecha_hora', 'asc');
             },
             'obrasSociales'
-        ])->findOrFail($id);
+        ])->firstOrFail();
 
         return view('public.turno', compact('psicologo'));
     }
 
-    // Procesa la reserva del paciente
-    public function store(Request $request, $id)
+    // Procesa la reserva del paciente usando el slug
+    public function store(Request $request, $slug)
     {
+        $psicologo = User::where('slug', $slug)->firstOrFail();
+        $id = $psicologo->id;
+
         $request->validate([
             'turno_id' => 'required|exists:turnos,id',
             'nombre' => 'required|string|max:255',

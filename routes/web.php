@@ -1,28 +1,23 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PatientController;
-use App\Http\Controllers\NoteController;
-use App\Http\Controllers\PublicAppointmentController;
-use App\Http\Controllers\ObraSocialController;
-use App\Http\Controllers\TurnoController;
-use App\Http\Controllers\PublicTurnoController;
+use App\Http\Controllers\TurnoPublicoController;
 use App\Http\Controllers\MercadoPagoWebhookController; 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TurnoFijoController;
 use App\Http\Controllers\FeriadoController;
-
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\ObraSocialController;
+use App\Http\Controllers\ProfileController;
 
 // Webhook de Mercado Pago
 Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle']);
 
-// Rutas Públicas (para los pacientes)
-Route::get('/turno/{username}', [PublicTurnoController::class, 'show'])->name('public.turno');
-Route::post('/turno/{username}', [PublicTurnoController::class, 'store'])->name('public.turno.store');
-
-Route::get('/reservar', [PublicAppointmentController::class, 'create'])->name('public.appointment');
-Route::post('/reservar', [PublicAppointmentController::class, 'store'])->name('public.appointment.store');
+// Rutas Públicas (para los pacientes usando el slug del psicólogo)
+Route::get('/turno/{slug}', [TurnoPublicoController::class, 'create'])->name('public.turno');
+Route::post('/turno/{slug}', [TurnoPublicoController::class, 'store'])->name('public.turno.store');
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,7 +31,7 @@ Route::get('/suscripcion-pagar', function () {
 // Rutas Protegidas (Requieren estar logueado Y tener la suscripción al día)
 Route::middleware(['auth', 'check.subscription'])->group(function () {
     
-    // Dashboard principal con el controlador que creamos
+    // Dashboard principal
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Perfil
@@ -59,28 +54,20 @@ Route::middleware(['auth', 'check.subscription'])->group(function () {
     Route::post('/mis-turnos/{id}/estado', [TurnoController::class, 'cambiarEstado'])->name('turnos.estado');
     Route::delete('/mis-turnos/{id}', [TurnoController::class, 'destroy'])->name('turnos.destroy');
     Route::get('/api/turnos', [TurnoController::class, 'getTurnosJson'])->name('turnos.json');
-    Route::patch('/turnos/{id}/aceptar', [App\Http\Controllers\TurnoController::class, 'aceptar'])->name('turnos.aceptar');
-    Route::patch('/turnos/{id}/rechazar', [App\Http\Controllers\TurnoController::class, 'rechazar'])->name('turnos.rechazar');
+    Route::patch('/turnos/{id}/aceptar', [TurnoController::class, 'aceptar'])->name('turnos.aceptar');
+    Route::patch('/turnos/{id}/rechazar', [TurnoController::class, 'rechazar'])->name('turnos.rechazar');
    
-     // Turnos Fijos
-     Route::get('/mis-turnos-fijos', [TurnoFijoController::class, 'index'])
-     ->name('turnos-fijos.index');
-     Route::post('/mis-turnos-fijos', [TurnoFijoController::class, 'store'])
-     ->name('turnos-fijos.store');
-     Route::post('/mis-turnos-fijos/{id}/estado', [TurnoFijoController::class, 'cambiarEstado'])
-     ->name('turnos-fijos.estado');
-     Route::delete('/mis-turnos-fijos/{id}', [TurnoFijoController::class, 'destroy'])
-     ->name('turnos-fijos.destroy');
+    // Turnos Fijos
+    Route::get('/mis-turnos-fijos', [TurnoFijoController::class, 'index'])->name('turnos-fijos.index');
+    Route::post('/mis-turnos-fijos', [TurnoFijoController::class, 'store'])->name('turnos-fijos.store');
+    Route::post('/mis-turnos-fijos/{id}/estado', [TurnoFijoController::class, 'cambiarEstado'])->name('turnos-fijos.estado');
+    Route::delete('/mis-turnos-fijos/{id}', [TurnoFijoController::class, 'destroy'])->name('turnos-fijos.destroy');
      
-      // Feriados / días sin atención
-        Route::get('/feriados', [FeriadoController::class, 'index'])
-        ->name('feriados.index');
-        Route::post('/feriados', [FeriadoController::class, 'store'])
-        ->name('feriados.store');
-        Route::delete('/feriados/{id}', [FeriadoController::class, 'destroy'])
-        ->name('feriados.destroy');
-       Route::post('/feriados/{feriado}/reprogramar', [FeriadoController::class, 'reprogramar'])
-        ->name('feriados.reprogramar');
+    // Feriados / días sin atención
+    Route::get('/feriados', [FeriadoController::class, 'index'])->name('feriados.index');
+    Route::post('/feriados', [FeriadoController::class, 'store'])->name('feriados.store');
+    Route::delete('/feriados/{id}', [FeriadoController::class, 'destroy'])->name('feriados.destroy');
+    Route::post('/feriados/{feriado}/reprogramar', [FeriadoController::class, 'reprogramar'])->name('feriados.reprogramar');
 
     // Obras Sociales del Psicólogo
     Route::get('/mis-obras-sociales', [ObraSocialController::class, 'index'])->name('obras.index');
