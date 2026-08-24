@@ -25,11 +25,15 @@ class ProfileUpdateRequest extends FormRequest
                 'email',
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
+            ],
                 'mensaje_bienvenida' => ['nullable', 'string'],
                 'activar_edad' => ['nullable', 'boolean'],
                 'activar_modalidad' => ['nullable', 'boolean'],
                 'activar_motivo' => ['nullable', 'boolean'],
-            ],
+                'activar_aviso_menores' => ['nullable', 'boolean'], 
+                'mensaje_aviso_menores' => ['nullable', 'string'],
+                'enviar_recordatorios' => ['nullable', 'string'],
+                'frecuencia_recordatorio' => ['nullable', 'string'],
         ];
     }
 }

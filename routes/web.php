@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TurnoPublicoController;
+use App\Http\Controllers\PublicTurnoController;
 use App\Http\Controllers\MercadoPagoWebhookController; 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TurnoFijoController;
@@ -11,13 +11,17 @@ use App\Http\Controllers\NoteController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\ObraSocialController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Schedule;
+
+//recordatorios
+Schedule::command('turnos:enviar-recordatorios')->dailyAt('08:00');
 
 // Webhook de Mercado Pago
 Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle']);
 
 // Rutas Públicas (para los pacientes usando el slug del psicólogo)
-Route::get('/turno/{slug}', [TurnoPublicoController::class, 'create'])->name('public.turno');
-Route::post('/turno/{slug}', [TurnoPublicoController::class, 'store'])->name('public.turno.store');
+Route::get('/turno/{slug}', [PublicTurnoController::class, 'show'])->name('public.turno');
+Route::post('/turno/{slug}', [PublicTurnoController::class, 'store'])->name('public.turno.store');
 
 Route::get('/', function () {
     return view('welcome');

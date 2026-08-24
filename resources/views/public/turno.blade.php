@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,36 +24,35 @@
 
         <!-- Mensaje de bienvenida personalizado del psicólogo -->
         @if(!empty($psicologo->mensaje_bienvenida))
-            <div class="mb-4 p-4 bg-teal-50 text-teal-900 rounded-xl text-sm whitespace-pre-line border border-teal-100">
-                {{ $psicologo->mensaje_bienvenida }}
-            </div>
+        <div class="mb-4 p-4 bg-teal-50 text-teal-900 rounded-xl text-sm whitespace-pre-line border border-teal-100">
+            {{ $psicologo->mensaje_bienvenida }}
+        </div>
         @else
-            <p class="text-center text-gray-500 mb-6 text-sm">
-                Selecciona un horario y tu cobertura
-            </p>
+        <p class="text-center text-gray-500 mb-6 text-sm">
+            Selecciona un horario y tu cobertura
+        </p>
         @endif
 
         @if(session('success'))
-            <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm shadow-sm text-center">
-                {{ session('success') }}
-            </div>
+        <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm shadow-sm text-center">
+            {{ session('success') }}
+        </div>
         @endif
 
         @if($errors->any())
-            <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm shadow-sm">
-                <ul class="list-disc list-inside">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm shadow-sm">
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
         @endif
 
         <form
             action="{{ route('public.turno.store', $psicologo->id) }}"
             method="POST"
-            class="space-y-4"
-        >
+            class="space-y-4">
             @csrf
 
             <!-- HORARIOS DISPONIBLES -->
@@ -63,16 +63,15 @@
                 <select
                     name="turno_id"
                     class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
-                    required
-                >
+                    required>
                     <option value="">
                         -- Selecciona un horario --
                     </option>
 
                     @foreach($psicologo->turnos as $turno)
-                        <option value="{{ $turno->id }}">
-                            {{ \Carbon\Carbon::parse($turno->fecha_hora)->format('d/m/Y H:i') }} hs
-                        </option>
+                    <option value="{{ $turno->id }}">
+                        {{ \Carbon\Carbon::parse($turno->fecha_hora)->format('d/m/Y H:i') }} hs
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -81,8 +80,7 @@
             <div>
                 <label
                     for="obra_social_id"
-                    class="block text-xs font-medium text-gray-500 uppercase mb-1"
-                >
+                    class="block text-xs font-medium text-gray-500 uppercase mb-1">
                     Obra Social / Particular:
                 </label>
 
@@ -90,8 +88,7 @@
                     name="obra_social_id"
                     id="obra_social_id"
                     class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
-                    required
-                >
+                    required>
                     <option value="">
                         -- Selecciona cobertura --
                     </option>
@@ -101,13 +98,12 @@
                     </option>
 
                     @foreach($psicologo->obrasSociales as $obra)
-                        <option
-                            value="{{ $obra->id }}"
-                            data-condiciones="{{ $obra->condiciones }}"
-                            data-copago="{{ $obra->copago_adicional }}"
-                        >
-                            {{ $obra->nombre }}
-                        </option>
+                    <option
+                        value="{{ $obra->id }}"
+                        data-condiciones="{{ $obra->condiciones }}"
+                        data-copago="{{ $obra->copago_adicional }}">
+                        {{ $obra->nombre }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -115,8 +111,7 @@
             <!-- INFORMACIÓN DE LA COBERTURA -->
             <div
                 id="info-obra-social"
-                class="hidden bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm shadow-sm"
-            >
+                class="hidden bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm shadow-sm">
                 <h3 class="font-bold text-teal-800 mb-2">
                     Información de la cobertura
                 </h3>
@@ -138,51 +133,48 @@
 
             <!-- CAMPOS DINÁMICOS -->
             @if($psicologo->activar_edad)
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">
-                        Edad del paciente / niño/a:
-                    </label>
-                    <input
-                        type="text"
-                        name="edad_paciente"
-                        value="{{ old('edad_paciente') }}"
-                        placeholder="Ej: 8 años"
-                        class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
-                        required
-                    >
-                </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Edad del Paciente / Niño/a:</label>
+                <input type="number" id="edad_paciente" name="edad_paciente" value="{{ old('edad_paciente') }}" class="border-gray-300 rounded-lg p-2.5 border w-full text-sm" placeholder="Ej: 8">
+            </div>
+
+            <!-- Contenedor del aviso para menores (Oculto por defecto con 'hidden') -->
+            @if($psicologo->activar_aviso_menores)
+            <div id="aviso-menores" class="hidden bg-amber-50 border-l-4 border-amber-400 p-4 rounded-md text-xs text-amber-800 space-y-1 mt-2">
+                <p class="font-bold">Aviso importante:</p>
+                <p>{{ $psicologo->mensaje_aviso_menores ?? 'La primera consulta para menores de edad se realiza únicamente con los padres o tutores.' }}</p>
+            </div>
+            @endif
             @endif
 
             @if($psicologo->activar_modalidad)
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">
-                        Modalidad de atención:
-                    </label>
-                    <select
-                        name="modalidad"
-                        class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
-                        required
-                    >
-                        <option value="">-- Selecciona modalidad --</option>
-                        <option value="presencial">Presencial</option>
-                        <option value="virtual">Virtual</option>
-                    </select>
-                </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">
+                    Modalidad de atención:
+                </label>
+                <select
+                    name="modalidad"
+                    class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
+                    required>
+                    <option value="">-- Selecciona modalidad --</option>
+                    <option value="presencial">Presencial</option>
+                    <option value="virtual">Virtual</option>
+                </select>
+            </div>
             @endif
 
             @if($psicologo->activar_motivo)
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">
-                        Motivo de consulta / Requisito:
-                    </label>
-                    <input
-                        type="text"
-                        name="motivo_consulta"
-                        value="{{ old('motivo_consulta') }}"
-                        placeholder="Ej: Atención, CUD, Aptos psicológicos"
-                        class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
-                    >
-                </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">
+                    Motivo de consulta / Requisito:
+                </label>
+                <input
+                    type="text"
+                    name="motivo_consulta"
+                    value="{{ old('motivo_consulta') }}"
+                    placeholder="Ej: Atención, CUD, Aptos psicológicos"
+                    class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]">
+            </div>
             @endif
 
             <!-- NOMBRE -->
@@ -195,8 +187,7 @@
                     name="nombre"
                     value="{{ old('nombre') }}"
                     class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
-                    required
-                >
+                    required>
             </div>
 
             <!-- APELLIDO -->
@@ -209,8 +200,7 @@
                     name="apellido"
                     value="{{ old('apellido') }}"
                     class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
-                    required
-                >
+                    required>
             </div>
 
             <!-- CELULAR -->
@@ -224,8 +214,7 @@
                     value="{{ old('celular') }}"
                     placeholder="Ej: 3704123456"
                     class="w-full border-gray-300 rounded-lg p-2.5 border text-sm focus:ring-[#10ac84] focus:border-[#10ac84]"
-                    required
-                >
+                    required>
             </div>
 
             <!-- BOTÓN -->
@@ -233,8 +222,7 @@
                 <button
                     type="submit"
                     class="w-full text-white rounded-lg px-5 py-3 text-xs font-bold uppercase tracking-widest transition shadow-md hover:opacity-95"
-                    style="background-color: #10ac84 !important;"
-                >
+                    style="background-color: #10ac84 !important;">
                     Solicitar Turno
                 </button>
             </div>
@@ -243,9 +231,28 @@
 
     </div>
 
-    <!-- JAVASCRIPT DE OBRA SOCIAL -->
+    <!-- JAVASCRIPT GENERAL (Aviso de menores y Obra Social) -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Lógica para mostrar/ocultar el aviso de menores dinámicamente
+            const inputEdad = document.getElementById('edad_paciente');
+            const avisoMenores = document.getElementById('aviso-menores');
+
+            if (inputEdad && avisoMenores) {
+                function verificarEdad() {
+                    let edad = parseInt(inputEdad.value);
+                    if (!isNaN(edad) && edad > 0 && edad < 18) {
+                        avisoMenores.classList.remove('hidden');
+                    } else {
+                        avisoMenores.classList.add('hidden');
+                    }
+                }
+
+                inputEdad.addEventListener('input', verificarEdad);
+                verificarEdad(); // Ejecutar por si carga con valor previo
+            }
+
+            // 2. Lógica existente de Obra Social
             const select = document.getElementById('obra_social_id');
             const info = document.getElementById('info-obra-social');
             const copagoContainer = document.getElementById('copago-container');
@@ -253,49 +260,52 @@
             const condicionesContainer = document.getElementById('condiciones-container');
             const condicionesText = document.getElementById('condiciones-text');
 
-            select.addEventListener('change', function () {
-                const selectedOption = this.options[this.selectedIndex];
+            if (select) {
+                select.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
 
-                info.classList.add('hidden');
-                copagoContainer.classList.add('hidden');
-                condicionesContainer.classList.add('hidden');
-                copagoText.textContent = '';
-                condicionesText.textContent = '';
+                    info.classList.add('hidden');
+                    copagoContainer.classList.add('hidden');
+                    condicionesContainer.classList.add('hidden');
+                    copagoText.textContent = '';
+                    condicionesText.textContent = '';
 
-                if (!this.value) {
-                    return;
-                }
+                    if (!this.value) {
+                        return;
+                    }
 
-                if (this.value === 'particular') {
-                    info.classList.remove('hidden');
-                    condicionesContainer.classList.remove('hidden');
-                    condicionesText.textContent = 'La atención es particular. El arancel y las condiciones serán informados por el profesional.';
-                    return;
-                }
+                    if (this.value === 'particular') {
+                        info.classList.remove('hidden');
+                        condicionesContainer.classList.remove('hidden');
+                        condicionesText.textContent = 'La atención es particular. El arancel y las condiciones serán informados por el profesional.';
+                        return;
+                    }
 
-                const condiciones = selectedOption.dataset.condiciones;
-                const copago = selectedOption.dataset.copago;
+                    const condiciones = selectedOption.dataset.condiciones;
+                    const copago = selectedOption.dataset.copago;
 
-                if (condiciones || copago) {
-                    info.classList.remove('hidden');
-                }
+                    if (condiciones || copago) {
+                        info.classList.remove('hidden');
+                    }
 
-                if (copago) {
-                    copagoContainer.classList.remove('hidden');
-                    const monto = Number(copago).toLocaleString('es-AR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                    copagoText.textContent = '$' + monto;
-                }
+                    if (copago) {
+                        copagoContainer.classList.remove('hidden');
+                        const monto = Number(copago).toLocaleString('es-AR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                        copagoText.textContent = '$' + monto;
+                    }
 
-                if (condiciones) {
-                    condicionesContainer.classList.remove('hidden');
-                    condicionesText.textContent = condiciones;
-                }
-            });
+                    if (condiciones) {
+                        condicionesContainer.classList.remove('hidden');
+                        condicionesText.textContent = condiciones;
+                    }
+                });
+            }
         });
     </script>
 
 </body>
+
 </html>

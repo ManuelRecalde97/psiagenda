@@ -34,9 +34,9 @@
                 Mis Obras Sociales / Coberturas
             </h3>
 
-            @if(isset($obrasSociales) && $obrasSociales->count() > 0)
+            @if(isset($obras) && $obras->count() > 0)
                 <div class="divide-y divide-gray-100">
-                    @foreach($obrasSociales as $obra)
+                    @foreach($obras as $obra)
                         <div class="py-3 flex justify-between items-center">
                             <div>
                                 <span class="font-medium text-gray-800 text-base">

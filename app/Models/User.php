@@ -28,6 +28,8 @@ class User extends Authenticatable
         'slug',
         'email',
         'password',
+        'activar_aviso_menores',
+        'mensaje_aviso_menores',
     ];
 
     /**

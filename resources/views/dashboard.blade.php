@@ -56,16 +56,17 @@
 
                 </div>
 
-                <!-- Botones de Acción Rápida unificados con el verde corporativo -->
-                <div class="flex flex-wrap gap-4">
-                    <a href="#" class="inline-flex items-center px-5 py-2.5 rounded-lg font-semibold text-xs text-white uppercase tracking-widest shadow-md transition hover:opacity-90" style="background-color: #10ac84;">
+                <div class="flex items-center gap-4 mt-4">
+                    <!-- Botón Nuevo Paciente -->
+                    <a href="{{ route('patients.create') }}" class="inline-flex items-center px-4 py-2 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-md hover:opacity-95 transition" style="background-color: #10ac84 !important;">
                         + Nuevo Paciente
                     </a>
-                    <a href="#" class="inline-flex items-center px-5 py-2.5 rounded-lg font-semibold text-xs text-white uppercase tracking-widest shadow-md transition hover:opacity-90" style="background-color: #10ac84;">
-                        📅 Agendar Turno
+
+                    <!-- Botón Agendar Turno (redirige a la gestión de turnos internos) -->
+                    <a href="{{ route('turnos.index') }}" class="inline-flex items-center px-4 py-2 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-md hover:opacity-95 transition" style="background-color: #10ac84 !important;">
+                        📅 Ver / Agendar Turno
                     </a>
                 </div>
-
                 <!-- Sección Agenda de Hoy -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-xl p-6 border border-gray-100">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Agenda de Hoy</h3>

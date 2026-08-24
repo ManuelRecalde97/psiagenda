@@ -2,88 +2,93 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Turno;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Turno;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class TurnoController extends Controller
 {
-    /**
-     * Muestra el panel con los turnos pendientes de aprobación y la agenda confirmada.
-     */
     public function index()
     {
-        $user_id = Auth::id();
-
-        // 1. Bandeja de Entrada: Turnos solicitados desde la web pública que esperan aprobación
-        $turnosPendientes = Turno::where('user_id', $user_id)
-            ->where('estado', 'pendiente')
-            ->where('fecha_hora', '>=', now())
-            ->with(['paciente', 'obraSocial'])
+        $turnos = Turno::where('user_id', auth()->id())
             ->orderBy('fecha_hora', 'asc')
-            ->get();
+            ->paginate(15);
 
-        // 2. Agenda Habitual: Turnos que ya fueron aceptados o creados manualmente
-        $turnos = Turno::where('user_id', $user_id)
-            ->whereIn('estado', ['confirmado', 'ocupado', 'disponible']) 
-            ->where('fecha_hora', '>=', now()->startOfDay())
-            ->with(['paciente', 'obraSocial'])
-            ->orderBy('fecha_hora', 'asc')
-            ->get();
-
-        // CORREGIDO: Enviamos $turnos para que la tabla de la vista lo lea bien
-        return view('turnos.index', compact('turnosPendientes', 'turnos'));
+        return view('turnos.index', compact('turnos'));
     }
 
-    /**
-     * Acepta la solicitud de un turno nuevo.
-     */
-    public function aceptar($id)
+    // Método para generar franjas horarias masivas
+    public function store(Request $request)
     {
-        $turno = Turno::where('user_id', Auth::id())->findOrFail($id);
-
-        $turno->update([
-            'estado' => 'confirmado'
+        $request->validate([
+            'dias' => 'required|array',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+            'duracion' => 'required|integer',
         ]);
 
-        return back()->with('success', '¡El turno ha sido confirmado y agendado con éxito!');
-    }
+        $userId = auth()->id();
+        $inicio = Carbon::parse($request->fecha_inicio);
+        $fin = Carbon::parse($request->fecha_fin);
+        $diasSeleccionados = $request->dias; // Array de días (0=Domingo, 1=Lunes, etc.)
+        $duracion = (int) $request->duracion;
 
-    /**
-     * Rechaza la solicitud y libera el horario para que otro paciente pueda reservarlo.
-     */
-    public function rechazar($id)
-    {
-        $turno = Turno::where('user_id', Auth::id())->findOrFail($id);
+        // Recorremos cada día dentro del rango de fechas
+        $periodo = CarbonPeriod::create($inicio, $fin);
 
-        $turno->update([
-            'estado' => 'disponible',
-            'patient_id' => null,
-            'obra_social_id' => null,
-        ]);
+        foreach ($periodo as $fecha) {
+            // Verificamos si el día actual de la semana coincide con los seleccionados
+            if (in_array($fecha->dayOfWeek, $diasSeleccionados)) {
+                
+                $bloques = [];
 
-        return back()->with('success', 'Solicitud rechazada. El horario vuelve a estar disponible en tu turnero público.');
-    }
+                // Bloque Mañana
+                if ($request->filled('manana_desde') && $request->filled('manana_hasta')) {
+                    $bloques[] = [
+                        'desde' => $request->manana_desde,
+                        'hasta' => $request->manana_hasta,
+                    ];
+                }
 
-    /**
-     * Cambia el estado del turno (Aceptar o Rechazar desde la tabla).
-     */
-    public function cambiarEstado(Request $request, $id)
-    {
-        $turno = Turno::where('user_id', Auth::id())->findOrFail($id);
-        $nuevoEstado = $request->input('estado');
+                // Bloque Tarde
+                if ($request->filled('tarde_desde') && $request->filled('tarde_hasta')) {
+                    $bloques[] = [
+                        'desde' => $request->tarde_desde,
+                        'hasta' => $request->tarde_hasta,
+                    ];
+                }
 
-        if ($nuevoEstado === 'confirmado') {
-            $turno->update(['estado' => 'confirmado']);
-            return back()->with('success', '¡El turno ha sido confirmado con éxito!');
-        } else {
-            // Si rechaza o libera
-            $turno->update([
-                'estado' => 'disponible',
-                'patient_id' => null,
-                'obra_social_id' => null,
-            ]);
-            return back()->with('success', 'Solicitud rechazada. El horario vuelve a estar disponible.');
+                // Generar los turnos para cada bloque horario
+                foreach ($bloques as $bloque) {
+                    $horaActual = Carbon::parse($fecha->format('Y-m-d') . ' ' . $bloque['desde']);
+                    $horaLimite = Carbon::parse($fecha->format('Y-m-d') . ' ' . $bloque['hasta']);
+
+                    while ($horaActual->copy()->addMinutes($duracion)->lessThanOrEqualTo($horaLimite)) {
+                        $turnoInicio = $horaActual->copy();
+                        $turnoFin = $horaActual->copy()->addMinutes($duracion);
+
+                        // Evitamos duplicados exactos para este psicólogo
+                        $existe = Turno::where('user_id', $userId)
+                            ->where('fecha_hora', $turnoInicio)
+                            ->exists();
+
+                        if (!$existe) {
+                            Turno::create([
+                                'user_id' => $userId,
+                                'fecha_hora' => $turnoInicio,
+                                'estado' => 'disponible',
+                            ]);
+                        }
+
+                        $horaActual = $turnoFin;
+                    }
+                }
+            }
         }
+
+        return redirect()->route('turnos.index')->with('success', '¡Franjas horarias generadas con éxito!');
     }
+
+    // Demás métodos que ya tengas en tu controlador (como cambiarEstado, destroy, etc.)
 }

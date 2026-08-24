@@ -65,16 +65,6 @@ class TurnoFijoController extends Controller
                 'date_format:H:i',
             ],
 
-            'frecuencia' => [
-                'required',
-                'in:semanal',
-            ],
-
-            'fecha_inicio' => [
-                'required',
-                'date',
-            ],
-
             'fecha_fin' => [
                 'nullable',
                 'date',
@@ -100,8 +90,8 @@ class TurnoFijoController extends Controller
             'obra_social_id' => $request->obra_social_id,
             'dia_semana' => $request->dia_semana,
             'hora' => $request->hora,
-            'frecuencia' => $request->frecuencia,
-            'fecha_inicio' => $request->fecha_inicio,
+            'frecuencia' => 'semanal',
+            'fecha_inicio' => date('d-m-y'),
             'fecha_fin' => $request->fecha_fin,
             'activo' => true,
         ]);

@@ -29,24 +29,27 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        // 1. Llena los datos estándar validados por el FormRequest (incluye nombre, email, etc.)
-        $user->fill($request->validated());
+    // Guardado directo usando los datos del request sin pasar por validated() para probar
+    $user->name = $request->input('name');
+    $user->email = $request->input('email');
 
-        // 2. Si el correo electrónico cambió, reseteamos la verificación de email
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
+    if ($user->isDirty('email')) {
+        $user->email_verified_at = null;
+    }
 
-        // 3. Asignación y guardado de las preferencias del turnero público (SaaS multi-usuario)
-        $user->mensaje_bienvenida = $request->input('mensaje_bienvenida');
-        $user->activar_edad = $request->has('activar_edad');
-        $user->activar_modalidad = $request->has('activar_modalidad');
-        $user->activar_motivo = $request->has('activar_motivo');
+    $user->mensaje_bienvenida = $request->input('mensaje_bienvenida');
+    $user->activar_edad = $request->has('activar_edad') ? 1 : 0;
+    $user->activar_modalidad = $request->has('activar_modalidad') ? 1 : 0;
+    $user->activar_motivo = $request->has('activar_motivo') ? 1 : 0;
+    $user->activar_aviso_menores = $request->has('activar_aviso_menores') ? 1 : 0;
+    $user->mensaje_aviso_menores = $request->input('mensaje_aviso_menores');
+    
+    $user->enviar_recordatorios = $request->input('enviar_recordatorios');
+    $user->frecuencia_recordatorio = $request->input('frecuencia_recordatorio');
 
-        // 4. Guardamos todos los cambios en la base de datos de una sola vez
-        $user->save();
+    $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
