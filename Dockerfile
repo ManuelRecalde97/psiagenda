@@ -14,7 +14,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+RUN sed -ri -e 's!/var/www!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 
 RUN echo '<Directory /var/www/html/public>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride All\n\tRequire all granted\n</Directory>' >> /etc/apache2/apache2.conf
 
@@ -23,7 +23,7 @@ WORKDIR /var/www/html
 
 RUN mkdir -p /var/www/html/storage && touch /var/www/html/storage/database.sqlite
 
-# Instalar dependencias de Composer y Node, luego compilar assets
+# Instalar Composer, luego dependencias de Node y compilar Vite con el código ya copiado
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install && npm run build
 
