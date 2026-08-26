@@ -21,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::policy(Patient::class, PatientPolicy::class);
+      if ($this->app->environment('production')) {
+        Artisan::call('migrate', ['--force' => true]);
+    }
     }
 }
