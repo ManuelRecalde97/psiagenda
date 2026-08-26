@@ -23,8 +23,9 @@ Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handl
 Route::get('/turno/{slug}', [PublicTurnoController::class, 'show'])->name('public.turno');
 Route::post('/turno/{slug}', [PublicTurnoController::class, 'store'])->name('public.turno.store');
 
+// Redirigir la raíz al login o al dashboard en lugar de la vista por defecto de Laravel
 Route::get('/', function () {
-    return view('welcome');
+    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
 // Ruta de pago de suscripción
