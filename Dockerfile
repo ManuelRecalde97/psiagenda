@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Instalar dependencias del sistema, herramientas de compilación y Node.js para Vite
+# Instalar dependencias del sistema y Node.js para compilar Vite
 RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip unzip git sqlite3 libsqlite3-dev curl
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
@@ -23,7 +23,7 @@ WORKDIR /var/www/html
 
 RUN mkdir -p /var/www/html/storage && touch /var/www/html/storage/database.sqlite
 
-# Instalar dependencias de PHP y Node, luego compilar los assets con Vite
+# Instalar dependencias de Composer y Node, luego compilar assets
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install && npm run build
 
