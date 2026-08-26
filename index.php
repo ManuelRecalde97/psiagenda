@@ -1,4 +1,25 @@
 <?php
 
-// Redirigir todas las peticiones a la carpeta public de Laravel
-require_once __DIR__.'/public/index.php';
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+// Determinar si el mantenimiento está activo...
+if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// Registrar el autoloader de Composer...
+require __DIR__.'/vendor/autoload.php';
+
+// Cargar la aplicación y manejar la petición...
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+$kernel = $app->make(Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+)->send();
+
+$kernel->terminate($request, $response);
