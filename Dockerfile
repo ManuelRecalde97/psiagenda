@@ -18,4 +18,9 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage
 
+# Crear un script de inicio para que corra las migraciones al arrancar el contenedor
+RUN echo '#!/bin/bash\nphp artisan config:clear\nphp artisan migrate --force\napache2-foreground' > /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
 EXPOSE 80
+CMD ["/usr/local/bin/start.sh"]
