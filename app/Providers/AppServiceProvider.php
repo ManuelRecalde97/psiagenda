@@ -25,13 +25,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Forzar HTTPS en producción para evitar el aviso de formulario no seguro
+        // Forzar HTTPS en producción para evitar avisos de formulario no seguro
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
 
-        // Si la tabla sessions no existe, ejecuta las migraciones automáticamente
-        if (app()->environment('production') && !Schema::hasTable('sessions')) {
+        // Ejecutar todas las migraciones automáticamente en producción si la base de datos está vacía o faltan tablas
+        if (app()->environment('production')) {
             Artisan::call('migrate', ['--force' => true]);
         }
     }
