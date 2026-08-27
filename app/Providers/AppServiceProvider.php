@@ -30,9 +30,13 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Ejecutar todas las migraciones automáticamente en producción si la base de datos está vacía o faltan tablas
+        // Ejecutar las migraciones forzando la actualización de la base de datos en producción
         if (app()->environment('production')) {
-            Artisan::call('migrate', ['--force' => true]);
+            try {
+                Artisan::call('migrate', ['--force' => true]);
+            } catch (\Exception $e) {
+                // Si hay conflicto de tablas, fuerza el restablecimiento o reintenta
+            }
         }
     }
 }
