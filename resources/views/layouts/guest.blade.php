@@ -12,8 +12,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Tailwind CSS CDN para garantizar que cargue siempre los estilos perfectos sin depender de Vite en producción -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
@@ -29,7 +29,7 @@
                 </a>
             </div>
 
-            <!-- Caja del Formulario -->
+            <!-- Caja del Formulario con marco verde -->
             <div class="w-full px-6 py-6 shadow-2xl overflow-hidden sm:rounded-xl" style="background-color: #e2f5f0; border: 2.5px solid #10ac84;">
                 {{ $slot }}
             </div>
