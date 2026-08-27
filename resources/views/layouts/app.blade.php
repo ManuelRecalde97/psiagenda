@@ -14,7 +14,6 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <!-- Cambiamos el fondo general de toda la página a un gris muy sutil y elegante -->
     <body class="font-sans antialiased" style="background-color: #edf2f7;">
         <div class="min-h-screen">
             @include('layouts.navigation')

@@ -22,14 +22,14 @@
         <!-- Contenedor Principal del Logo y la Caja -->
         <div class="w-full sm:max-w-md flex flex-col items-center">
             
-            <!-- Logo de Psiagenda bien cerrado y estructurado -->
+            <!-- Logo de Psiagenda -->
             <div class="mb-6 text-center">
                 <a href="/">
                     <img src="{{ asset('images/logo.svg') }}" style="max-height: 80px; width: auto;" alt="psiagenda logo">
                 </a>
             </div>
 
-            <!-- Caja del Formulario con marco verde -->
+            <!-- Caja del Formulario -->
             <div class="w-full px-6 py-6 shadow-2xl overflow-hidden sm:rounded-xl" style="background-color: #e2f5f0; border: 2.5px solid #10ac84;">
                 {{ $slot }}
             </div>
