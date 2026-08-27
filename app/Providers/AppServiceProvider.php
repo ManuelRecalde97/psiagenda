@@ -25,18 +25,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Forzar HTTPS en producción para evitar avisos de formulario no seguro
+        // Forzar HTTPS en producción
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
 
-        // Ejecutar las migraciones forzando la actualización de la base de datos en producción
+        // Ejecutar todas las migraciones automáticamente en producción al arrancar
         if (app()->environment('production')) {
-            try {
-                Artisan::call('migrate', ['--force' => true]);
-            } catch (\Exception $e) {
-                // Si hay conflicto de tablas, fuerza el restablecimiento o reintenta
-            }
+            Artisan::call('migrate', ['--force' => true]);
         }
     }
 }
