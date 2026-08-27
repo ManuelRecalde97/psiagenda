@@ -1,9 +1,9 @@
+
 <?php
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\CheckSubscription;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,9 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Registramos el middleware usando la clase directamente
+        // Registramos el alias tal como lo piden las rutas
         $middleware->alias([
-            'check.subscription' => CheckSubscription::class,
+            'check.subscription' => \App\Http\Middleware\CheckSubscription::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
